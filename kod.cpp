@@ -8,22 +8,22 @@
 #include <memory>
 #include <cstdio>
 
-const double mass_of_ms21 = 70000.0;          // масса самолета, кг
-const double wing_area_of_ms21 = 113.0;       // площадь крыла, м^2
-const double sum_thrust_of_ms21 = 2 * 137200.0; // суммарная тяга, Н
-const double cy0_of_ms21 = 0.25;               // коэффициент подъемной силы при нулевом угле атаки
-const double real_thrust_of_ms21 = 0.9;     // реалистичный процент тяги
-const double start_altitude_of_ms21 = 400.0;      // начальная высота, м
-const double final_altitude_of_ms21 = 6500.0;       // конечная высота, м
-const double start_velocity = 310.0 / 3.6; // начальная скорость, м/с
-const double final_velocity = 550.0 / 3.6;  // конечная скорость, м/с
-const double gravity = 9.81;               // ускорение свободного падения, м/с^2
+const double mass_of_ms21 = 70000.0;
+const double wing_area_of_ms21 = 113.0;
+const double sum_thrust_of_ms21 = 2 * 137200.0;
+const double cy0_of_ms21 = 0.25;
+const double real_thrust_of_ms21 = 0.9;
+const double start_altitude_of_ms21 = 400.0;
+const double final_altitude_of_ms21 = 6500.0;
+const double start_velocity = 310.0 / 3.6;
+const double final_velocity = 550.0 / 3.6;
+const double gravity = 9.81;
 const double pi = 3.14159;
 const double cy0 = 0.250;
-const double max_climb_angle = 15.0; // максимальный угол набора высоты в градусах
-const double deg_to_rad = 57.3; // перевод из градусов в радианы
-const double max_vert_velocity = 8.0; // максимальная скорость набора высоты
-const double min_vert_velocity = start_velocity; // минимальная скорость для набора высоты
+const double max_climb_angle = 15.0;
+const double deg_to_rad = 57.3;
+const double max_vert_velocity = 8.0;
+const double min_vert_velocity = start_velocity;
 const double delta_H = 250;
 class CSVWriter {
 private:
@@ -105,18 +105,17 @@ public:
 
 class TrajectoryPoint {
 public:
-    double time;        // Время, с
-    double y;           // Высота, м
-    double V;           // Скорость, м/с
-
+    double time;
+    double y;
+    double V;
 
     TrajectoryPoint(double t = 0, double Y = 0, double vel = 0)
         : time(t), y(Y), V(vel) {}
 
     void print() const {
-        std::cout << "Текущая точка\n";
+        std::cout << "Current point\n";
         std::cout << std::fixed << std::setprecision(1);
-        std::cout << "t=" << time << "с, H=" << y << "м, V=" << V*3.6 << "км/ч, ";
+        std::cout << "t=" << time << "c, H=" << y << "m, V=" << V*3.6 << "km/h, ";
     }
 };
 
@@ -148,20 +147,20 @@ public:
             csv.writeRow(row_data);
         }
 
-        std::cout << "Траектория сохранена в файл: " << filename << std::endl;
+        std::cout << "Trajectory was saved in file: " << filename << std::endl;
     }
 
     void plotTrajectory() const {
         FILE* gp = _popen("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\" -persist", "w");
         if (!gp) {
-            std::cerr << "Ошибка" << std::endl;
+            std::cerr << "Error" << std::endl;
             return;
         }
 
         fprintf(gp, "set terminal wxt size 1200,800 font 'Arial,12'\n");
         fprintf(gp, "set multiplot layout 2,2 title 'parametres of flight of ms21'\n");
 
-        // Высота от времени
+        // ╨Т╤Л╤Б╨╛╤В╨░ ╨╛╤В ╨▓╤А╨╡╨╝╨╡╨╜╨╕
         fprintf(gp, "set title 'height from time'\n");
         fprintf(gp, "set xlabel 'time, sek'\n");
         fprintf(gp, "set ylabel 'height, m'\n");
@@ -171,7 +170,7 @@ public:
             fprintf(gp, "%f %f\n", point.time, point.y);
         }
         fprintf(gp, "e\n");
-        // Скорость от времени
+        // ╨б╨║╨╛╤А╨╛╤Б╤В╤М ╨╛╤В ╨▓╤А╨╡╨╝╨╡╨╜╨╕
         fprintf(gp, "set title 'velocity from time'\n");
         fprintf(gp, "set xlabel 'time, sek'\n");
         fprintf(gp, "set ylabel 'velocity, km/h'\n");
@@ -183,7 +182,7 @@ public:
         fprintf(gp, "e\n");
         fprintf(gp, "unset multiplot\n");
         fflush(gp);
-        std::cout << "Закройте окно Gnuplot чтобы продолжить" << std::endl;
+        std::cout << "close window Gnuplot to continue" << std::endl;
         std::cin.get();
          _pclose(gp);
     }
@@ -197,22 +196,21 @@ private:
 
 public:
     double mass;
-    double thrust;      // Тяга, Н
-    double fuel_flow;   // Расход топлива, кг/с
-    double Cx0;         // Коэффициент сопротивления при нулевой подъемной силе
-    double K;           // Коэффициент индуктивного сопротивления
-    double Cy_max;      // Максимальный коэффициент подъемной силы
+    double thrust;
+    double fuel_flow;
+    double Cx0;
+    double K;
+    double Cy_max;
 
     Aircraft(double m = mass_of_ms21, double wing = wing_area_of_ms21)
         : wing_area(wing), initial_mass(m), env(), mass(m) {
 
         thrust = sum_thrust_of_ms21 * real_thrust_of_ms21;
-        fuel_flow = 0.69; // кг/с - при крейсерском движении
+        fuel_flow = 0.69;
         Cx0 = 0.0275;
         K = 0.05;
         Cy_max = 1.1;
     }
-    // Расчет угла атаки (в градусах)
     double calculate_alpha(double current_altitude, double current_velocity) {
         double rho = env.getDensity(current_altitude);
         double grad_Cy = grad_Cy_alpha();
@@ -223,18 +221,15 @@ public:
         return alpha;
 
     }
-    // Расчет градиента коэффициента подъема
     double grad_Cy_alpha() const{
-        double b = 39.6; // размах крыла
+        double b = 39.6; // ╤А╨░╨╖╨╝╨░╤Е ╨║╤А╤Л╨╗╨░
         double AR = b*b/wing_area_of_ms21;
         return ((2 * pi * AR) / (2 + pow(4+AR*AR, 0.5))) * pi/180;
     }
 
-    // Коэффициент подъемной силы в зависимости от угла атаки
 double getLiftCoefficient(double alpha) const{
         if (alpha < 0) alpha = 0;
         if (alpha > 12) alpha = 12;
-    // Для расчета воспользуемся линейной зависимостью
         double grad_Cy = grad_Cy_alpha();
         double Cy = 0.25 + grad_Cy * alpha;
         if (Cy > 1.1)
@@ -242,12 +237,10 @@ double getLiftCoefficient(double alpha) const{
         return Cy;
 
 }
-    // Коэффициент сопротивления в зависимости от коэффициента подъемной силы
     double getDragCoefficient(double Cl) const {
         return Cx0 + K * Cl * Cl;
     }
 
-    // Подъемная сила
     double computeLiftForce(double current_velocity, double current_altitude, double alpha) const {
         double rho = env.getDensity(current_altitude);
         double Cy = getLiftCoefficient(alpha);
@@ -255,18 +248,16 @@ double getLiftCoefficient(double alpha) const{
         return L;
     }
 
-    // Сила сопротивления
     double computeDragForce(double current_velocity, double current_altitude, double alpha) const {
         double rho = env.getDensity(current_altitude);
         double Cx = getDragCoefficient(getLiftCoefficient(alpha));
         double X = 0.5 * rho * current_velocity * current_velocity * wing_area_of_ms21 * Cx;
         return X;
     }
-    // Расчет тяги в зависимости от параметров окружающей среды
     double total_thrust(double current_altitude){
         double p_0 = env.getPressure(0);
         double current_p = env.getPressure(current_altitude);
-        return sum_thrust_of_ms21*real_thrust_of_ms21 * pow(current_p/p_0, 0.7); // коррекция тяги по плотности и давлению
+        return sum_thrust_of_ms21*real_thrust_of_ms21 * pow(current_p/p_0, 0.7); // ╨║╨╛╤А╤А╨╡╨║╤Ж╨╕╤П ╤В╤П╨│╨╕ ╨┐╨╛ ╨┐╨╗╨╛╤В╨╜╨╛╤Б╤В╨╕ ╨╕ ╨┤╨░╨▓╨╗╨╡╨╜╨╕╤О
     }
 };
 
@@ -276,7 +267,6 @@ class DynamicProgrammingSolver {
         TableInterpolator env;
 public:
     DynamicProgrammingSolver() {}
-    // Расчет этапа разгона
     double calculate_razgon(double altitude, double start_velocity, double final_velocity, Aircraft& ac){
         double avg_Vel = (start_velocity+final_velocity) / 2;
         if (avg_Vel < min_vert_velocity) avg_Vel = min_vert_velocity;
@@ -291,7 +281,6 @@ public:
         return (final_velocity - start_velocity) / a_x;
 
     }
-    // Расчет этапа подъема
     double calculate_podiem(double initial_alt, double final_alt, double velocity, Aircraft& ac){
         double avg_alt = (final_alt - initial_alt) / 2;
         double current_P = ac.total_thrust(avg_alt);
@@ -309,7 +298,6 @@ public:
         double dt = (final_alt-initial_alt) / vel_y;
         return dt;
     }
-    // Расчет этапа подъем разгон
     double calculate_podiem_razgon(double initial_alt, double final_alt, double initial_vel, double final_vel, Aircraft& ac){
         double avg_alt = 0.5 * (final_alt - initial_alt);
         double avg_vel = 0.5 * (final_vel - initial_vel);
@@ -341,8 +329,8 @@ public:
             Hgrid[i] = start_altitude_of_ms21 + i * delta_H;
             Vgrid[i] = start_velocity + i * DELTA_V;
         }
-        std::cout << "Критерий минимизации времени" << "\n";
-        std::cout << "Текущее количество N: " << N << "\n";
+        std::cout << "criteria of minimisation of time" << "\n";
+        std::cout << "current number N: " << N << "\n";
         std::vector<std::vector<double>> cost_table(N + 1, std::vector<double>(N + 1, 1e9));
         std::vector<std::vector<double>> time_table(N + 1, std::vector<double>(N + 1, 0.0));
         std::vector<std::vector<int>> prev_i(N + 1, std::vector<int>(N + 1, -1));
@@ -395,8 +383,7 @@ public:
                 }
             }
         }
-        // Вывод матрицы времени
-        std::cout << "Матрица времени (s):\n";
+        std::cout << "time matrix (s):\n";
         std::cout << "     V";
         for (int j = 0; j <= N; j++) {
             std::cout << std::setw(7) << (int)Vgrid[j];
@@ -431,9 +418,9 @@ public:
             if (pi == -1) break;
             ci = pi;
             cj = pj;
-            std::cout << "Оптимальный путь полета\n";
-            std::cout << "Высота: " <<path[i].first << "\nСкорость: " << path[i].second << "\n\n";
-            std::cout << "Текущая точка\n";
+            std::cout << "optimal way of flight\n";
+            std::cout << "height: " <<path[i].first << "\nvelocity: " << path[i].second << "\n\n";
+            std::cout << "current point\n";
             std::cout << "Time: " << point.time << " Y: " << point.y << " V:" << point.V << "\n";
             i++;
         }
@@ -450,7 +437,7 @@ int main() {
         trajectory.saveToCSV("ms21_trajectory_realistic.csv");
         trajectory.plotTrajectory();
     } catch (const std::exception& e) {
-        std::cerr << "ОШИБКА: " << e.what() << std::endl;
+        std::cerr << "error: " << e.what() << std::endl;
         return 1;
     }
 
